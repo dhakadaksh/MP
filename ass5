@@ -1,0 +1,87 @@
+section .da
+    msg0 db ";write x86/64 ALP to perform the following operation: 1.Addition 2.Subtraction 3.Multiplication 4.Division. Name: devanshu Rollno: 7220 Date of performance: 18 march 2025", 10
+    msg0len equ $ - msg0
+ 
+    num1 db "Enter first number (4-digit Hex):", 0
+    num1len equ $ - num1
+    msg_bcd db "BCD Result: ", 0
+    msg_bcd_len equ $ - msg_bcd
+ 
+section .bss
+    hex_input resb 4            ; Buffer for hex input (4 bytes)
+    bcd_output resb 5           ; Buffer for BCD output (5 bytes, 1 for each decimal digit)
+ 
+section .text
+    global _start
+ 
+_start:
+    ; Display the introductory message
+    mov rdi, 1
+    mov rsi, msg0
+    mov rdx, msg0len
+    call io
+ 
+    ; Prompt user for hex input (4-digit hexadecimal number)
+    mov rdi, 1
+    mov rsi, num1
+    mov rdx, num1len
+    call io
+ 
+    ; Read the input (4 hex digits)
+    mov rdi, 0                  ; File descriptor 0 for stdin
+    mov rsi, hex_input          ; Address to store input
+    mov rdx, 4                  ; Number of bytes to read (4 hex digits)
+    call io
+ 
+    ; Convert the 4-digit hexadecimal input to BCD
+    ; First, we need to convert the hexadecimal number to decimal.
+ 
+    ; Load the hex input into registers and convert it
+    movzx rax, byte [hex_input] ; Load the first byte (most significant hex digit)
+    call hex_to_bcd
+ 
+    ; Output the BCD result
+    mov rdi, 1                  ; File descriptor 1 for stdout
+    mov rsi, msg_bcd            ; Message indicating BCD result
+    mov rdx, msg_bcd_len
+    call io
+ 
+    ; Print the BCD result
+    mov rdi, 1
+    mov rsi, bcd_output         ; Address of the BCD output
+    mov rdx, 5                  ; Length of the BCD output
+    call io
+ 
+    ; Exit the program
+    call exit
+ 
+; I/O function for printing and reading data (syscall interface)
+%macro io 4
+    mov rax, 0x1           ; Syscall number for write
+    mov rdi, %1            ; File descriptor
+    mov rsi, %2            ; Address of buffer/message
+    mov rdx, %3            ; Length of the buffer/message
+    syscall
+%endmacro
+ 
+; Exit function (exit system call)
+%macro exit 0
+    mov rax, 60           ; Syscall number for exit
+    mov rdi, 0            ; Exit code 0
+    syscall
+%endmacro
+ 
+; Function to convert hexadecimal to BCD
+hex_to_bcd:
+    ; Simple example conversion function for understanding purposes
+    ; Convert hex value in rax to a decimal representation
+    ; Convert each 4-bit nibble into its corresponding BCD value
+ 
+    ; For simplicity, this is a placeholder and needs to be expanded based on input format.
+    ; The program should split the hex input into individual digits and store each in the BCD output.
+ 
+    ; Example: assume rax contains a hex value and we need to convert it to BCD digits
+    ; In practice, this should convert each nibble of hex to a decimal and store as BCD.
+ 
+    ; Return from function
+    ret
